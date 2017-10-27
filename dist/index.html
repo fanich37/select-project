@@ -17,39 +17,28 @@
 	</div>
 	<div style='padding:50px;width:500px;height:100px;background-color:lightgrey'>
 		<select id="test2">
-			<option>test1 long message</option>
-			<option>test2</option>
-			<option>test3</option>
-			<option>test4</option>
-			<option>test5</option>
+			<option value="test1" selected="selected">test1 long message</option>
+			<option value="test2">test2</option>
+			<option value="test3">test3</option>
+			<option value="test4">test4</option>
+			<option value="test5">test5</option>
 		</select>
 	</div>
-	<!-- <div style='padding:50px;width:500px;height:100px;background-color:lightgrey'>
-		<div class="select">
-			<a href='/' class="select__title">
-				<span class="select__text">test1</span>
-				<span class="select__icon"></span>
-			</a>
-			<div class="select__wrapper">
-				<ul class="select__list">
-					<li class="select__item">test1</li>
-					<li class="select__item">test2</li>
-					<li class="select__item">test3</li>
-					<li class="select__item">test4</li>
-					<li class="select__item">test5</li>
-				</ul>
-			</div>
-		</div>
-	</div> -->
 	<script src='assets/scripts/select-project.min.js'></script>
 	<script type="text/javascript">
-		var select = new Select({
-			selector: '#test'
+		new Select({
+			selector: '#test',
+			callBack: function(item) {
+				console.log(item.el);
+				console.log('You selected the item with a value: ' + item.value);
+			}
 		});
-		var select2 = new Select({
-			selector: '#test2'
+		new Select({
+			selector: '#test2',
+			callBack: function(item) {
+				alert(item.el.getAttribute('data-value'));
+			}
 		});
-		select2.icon = 'zzz';
 	</script>
 </body>
 </html>

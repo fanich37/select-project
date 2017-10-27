@@ -150,8 +150,15 @@
 		document.body.removeEventListener('click', closeOnBodyClick);
 	}
 
+	function getValue(el) {
+		return el.getAttribute('data-value');
+	}
+
 	function doCallBack(fn, el) {
-		fn(el);
+		fn({
+			el: el,
+			value: getValue(el)
+		});
 	}
 
 	function changeSelectedAttrAndClass(e) {
