@@ -1,11 +1,15 @@
-;(function () {
+;(function (root, factory) {
+	if(typeof define === 'function' && define.amd) {
+		define([], factory(root));
+	} else if(typeof exports === 'object') {
+		module.exports = factory(root);
+	} else {
+		root.Select = factory(root);
+	}
+})(typeof global !== 'undefined' ? global : window || this.window || this.global, function (root) {
 	'use strict';
 
-	// Check the browser and if it's IE - add the polyfill for
-	// closest() method.
-	var browser = window.navigator.userAgent.toLowerCase();
-	var isIE = (/trident/gi).test(browser) || (/msie/gi).test(browser);
-	if (isIE) {
+	if (!Element.prototype.closest) {
 		(function(ELEMENT) {
 			ELEMENT.matches = ELEMENT.matches || ELEMENT.mozMatchesSelector || ELEMENT.msMatchesSelector || ELEMENT.oMatchesSelector || ELEMENT.webkitMatchesSelector;
 			ELEMENT.closest = ELEMENT.closest || function closest(selector) {
@@ -20,7 +24,7 @@
 
 	window.Select = Select || {};
 
-	var defaultClasses = {
+	const defaultClasses = {
 		newSelectClass: 'select',
 		buttonClass: 'select__title',
 		textClass: 'select__text',
@@ -48,13 +52,13 @@
 	}
 
 	function getOptionAttributes(el) {
-		return Array.prototype.slice.call(document.querySelector(el).children).map(function(item) {
+		return Array.prototype.slice.call(document.querySelector(el).children).map(item => {
 			return Array.prototype.slice.call(item.attributes);
 		});
 	}
 
 	function getOptionInnerText(el) {
-		return Array.prototype.slice.call(document.querySelector(el).children).map(function(item) {
+		return Array.prototype.slice.call(document.querySelector(el).children).map(item => {
 			return item.textContent;
 		});
 	}
@@ -88,20 +92,18 @@
 		this.list = document.createElement('UL');
 		this.list.className = defaultClasses.listClass;
 
-		optionsArray.forEach(function(item, i) {
-			var _this = this;
-
+		optionsArray.forEach((item, i) => {
 			this.listItem = document.createElement('LI');
 			this.listItem.className = defaultClasses.listItemClass;
 			this.listItem.textContent = getOptionInnerText(el)[i];
 			if (item.length) {
-				item.forEach(function(attr) {
+				item.forEach(attr => {
 					if (attr.value === 'selected') {
 						this.listItem.classList.add(defaultClasses.listItemSelectedClass);
 						this.text.textContent = getOptionInnerText(el)[i];
 					}
 					this.listItem.setAttribute('data-' + attr.name, attr.value);
-				}, _this);
+				});
 			}else {
 				if (!i) {
 					this.listItem.classList.add(defaultClasses.listItemSelectedClass);
@@ -110,7 +112,7 @@
 				}
 			}
 			this.list.appendChild(this.listItem);
-		}, this);
+		});
 
 		this.button.appendChild(this.text);
 		this.button.appendChild(this.icon);
@@ -123,11 +125,11 @@
 	}
 
 	function open() {
-		var openedSelect = Array.prototype.slice.call(document.getElementsByClassName('select--open'));
+		const openedSelect = Array.prototype.slice.call(document.getElementsByClassName('select--open'));
 		
 		// If there are opened select elements - close theme if we open the new one.
 		if (openedSelect.length) {
-			openedSelect.forEach(function (item) {
+			openedSelect.forEach(item => {
 				item.classList.remove('select--open');
 			});
 		}
@@ -142,7 +144,7 @@
 	}
 
 	function closeOnBodyClick() {
-		var openedSelect = document.getElementsByClassName('select--open')[0] ? document.getElementsByClassName('select--open')[0] : null;
+		const openedSelect = document.getElementsByClassName('select--open')[0] ? document.getElementsByClassName('select--open')[0] : null;
 		if (openedSelect) {
 			openedSelect.classList.remove('select--open');
 		}
@@ -161,8 +163,8 @@
 	}
 
 	function changeSelectedAttrAndClass(e) {
-		var newSelectedItem = e.target.closest('.select__item');
-		var selectedItem = newSelectedItem.parentElement.querySelector('.' + defaultClasses.listItemSelectedClass);
+		const newSelectedItem = e.target.closest('.select__item');
+		const selectedItem = newSelectedItem.parentElement.querySelector('.' + defaultClasses.listItemSelectedClass);
 		
 		selectedItem.classList.remove(defaultClasses.listItemSelectedClass);
 		selectedItem.removeAttribute('data-selected');
@@ -181,7 +183,7 @@
 	}
 
 	function initClickEvent() {
-		var _this = this;
+		const _this = this;
 
 		this.newSelect.addEventListener('click', function(e) {
 			e.preventDefault();
@@ -199,4 +201,6 @@
 		});
 	}
 
-}());
+	return Select;
+
+});
