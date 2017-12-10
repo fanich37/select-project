@@ -29,7 +29,7 @@
 		buttonClass: 'select__title',
 		textClass: 'select__text',
 		iconClass: 'select__icon',
-		listWrapperClass: 'select__wrapper',
+		listWrapperClass: 'select__inner',
 		listClass: 'select__list',
 		listItemClass: 'select__item',
 		listItemSelectedClass: 'select__item--selected'
@@ -92,6 +92,7 @@
 		this.list = document.createElement('UL');
 		this.list.className = defaultClasses.listClass;
 
+		let isSelectedAttr = false;
 		optionsArray.forEach((item, i) => {
 			this.listItem = document.createElement('LI');
 			this.listItem.className = defaultClasses.listItemClass;
@@ -101,6 +102,7 @@
 					if (attr.value === 'selected') {
 						this.listItem.classList.add(defaultClasses.listItemSelectedClass);
 						this.text.textContent = getOptionInnerText(el)[i];
+						isSelectedAttr = true;
 					}
 					this.listItem.setAttribute('data-' + attr.name, attr.value);
 				});
@@ -113,6 +115,11 @@
 			}
 			this.list.appendChild(this.listItem);
 		});
+
+		if (!isSelectedAttr) {
+			this.list.querySelector(`.${defaultClasses.listItemClass}`).classList.add(defaultClasses.listItemSelectedClass);
+			this.text.textContent = getOptionInnerText(el)[0];
+		}
 
 		this.button.appendChild(this.text);
 		this.button.appendChild(this.icon);
@@ -164,10 +171,12 @@
 
 	function changeSelectedAttrAndClass(e) {
 		const newSelectedItem = e.target.closest('.select__item');
-		const selectedItem = newSelectedItem.parentElement.querySelector('.' + defaultClasses.listItemSelectedClass);
+		const oldSelectedItem = newSelectedItem.parentElement.querySelector(`.${defaultClasses.listItemSelectedClass}`);
 		
-		selectedItem.classList.remove(defaultClasses.listItemSelectedClass);
-		selectedItem.removeAttribute('data-selected');
+		// console.log(selectedItem)
+
+		oldSelectedItem.classList.remove(defaultClasses.listItemSelectedClass);
+		oldSelectedItem.removeAttribute('data-selected');
 		newSelectedItem.classList.add(defaultClasses.listItemSelectedClass);
 		newSelectedItem.setAttribute('data-selected', 'selected');
 	}

@@ -3,12 +3,12 @@
 	display inline-block
 	box-sizing border-box
 	width 180px
-	
+
 	&:hover ^[0]__title
 		background-color #999
 	
 	&--open 
-		& ^[0]__wrapper
+		& ^[0]__inner
 			display block
 
 		& ^[0]__title
@@ -44,7 +44,7 @@
 		border-right 6px solid transparent
 		transition .3s
 
-	&__wrapper
+	&__inner
 		position absolute
 		z-index 1
 		top 100%
