@@ -43,32 +43,32 @@
 		this.listWrapper = null;
 		this.select = document.querySelector(this.selectEl);
 		
-		createNewSelect.apply(this, [this.selectEl, getSelectAttributes(this.selectEl), getOptionAttributes(this.selectEl)]);
-		initClickEvent.call(this);
+		this.createNewSelect(this.selectEl, this.getSelectAttributes(this.selectEl), this.getOptionAttributes(this.selectEl));
+		this.initClickEvent();
 	}
 
-	function getSelectAttributes(el) {
+	Select.prototype.getSelectAttributes = function(el) {
 		return Array.prototype.slice.call(document.querySelector(el).attributes);
 	}
 
-	function getOptionAttributes(el) {
+	Select.prototype.getOptionAttributes = function(el) {
 		return Array.prototype.slice.call(document.querySelector(el).children).map(item => {
 			return Array.prototype.slice.call(item.attributes);
 		});
 	}
 
-	function getOptionInnerText(el) {
+	Select.prototype.getOptionInnerText = function(el) {
 		return Array.prototype.slice.call(document.querySelector(el).children).map(item => {
 			return item.textContent;
 		});
 	}
 
-	function hideSelectEl(el) {
+	Select.prototype.hideSelectEl = function(el) {
 		document.querySelector(el).style.display = 'none';
 	}
 
-	function createNewSelect(el, selectArray, optionsArray) {
-		hideSelectEl(el);
+	Select.prototype.createNewSelect = function(el, selectArray, optionsArray) {
+		this.hideSelectEl(el);
 
 		this.newSelect = document.createElement('DIV');
 		this.newSelect.className = defaultClasses.newSelectClass
@@ -92,16 +92,18 @@
 		this.list = document.createElement('UL');
 		this.list.className = defaultClasses.listClass;
 
+		this.optionInnerText = this.getOptionInnerText(el);
+
 		let isSelectedAttr = false;
 		optionsArray.forEach((item, i) => {
 			this.listItem = document.createElement('LI');
 			this.listItem.className = defaultClasses.listItemClass;
-			this.listItem.textContent = getOptionInnerText(el)[i];
+			this.listItem.textContent = this.optionInnerText[i];
 			if (item.length) {
 				item.forEach(attr => {
 					if (attr.value === 'selected') {
 						this.listItem.classList.add(defaultClasses.listItemSelectedClass);
-						this.text.textContent = getOptionInnerText(el)[i];
+						this.text.textContent = this.optionInnerText[i];
 						isSelectedAttr = true;
 					}
 					this.listItem.setAttribute('data-' + attr.name, attr.value);
@@ -110,7 +112,7 @@
 				if (!i) {
 					this.listItem.classList.add(defaultClasses.listItemSelectedClass);
 					this.listItem.setAttribute('data-selected', 'selected');
-					this.text.textContent = getOptionInnerText(el)[i];
+					this.text.textContent = this.optionInnerText[i];
 				}
 			}
 			this.list.appendChild(this.listItem);
@@ -118,7 +120,7 @@
 
 		if (!isSelectedAttr) {
 			this.list.querySelector(`.${defaultClasses.listItemClass}`).classList.add(defaultClasses.listItemSelectedClass);
-			this.text.textContent = getOptionInnerText(el)[0];
+			this.text.textContent = this.optionInnerText[0];
 		}
 
 		this.button.appendChild(this.text);
@@ -131,7 +133,7 @@
 		document.querySelector(el).parentElement.appendChild(this.newSelect);
 	}
 
-	function open() {
+	Select.prototype.open = function() {
 		const openedSelect = Array.prototype.slice.call(document.getElementsByClassName('select--open'));
 		
 		// If there are opened select elements - close theme if we open the new one.
@@ -142,15 +144,15 @@
 		}
 
 		this.newSelect.classList.add('select--open');
-		document.body.addEventListener('click', closeOnBodyClick);
+		document.body.addEventListener('click', this.closeOnBodyClick);
 	}
 
-	function close() {
+	Select.prototype.close = function() {
 		this.newSelect.classList.remove('select--open');
-		document.body.removeEventListener('click', closeOnBodyClick);
+		document.body.removeEventListener('click', this.closeOnBodyClick);
 	}
 
-	function closeOnBodyClick() {
+	Select.prototype.closeOnBodyClick = function() {
 		const openedSelect = document.getElementsByClassName('select--open')[0] ? document.getElementsByClassName('select--open')[0] : null;
 		if (openedSelect) {
 			openedSelect.classList.remove('select--open');
@@ -158,40 +160,38 @@
 		document.body.removeEventListener('click', closeOnBodyClick);
 	}
 
-	function getValue(el) {
+	Select.prototype.getValue = function(el) {
 		return el.getAttribute('data-value');
 	}
 
-	function doCallBack(fn, el) {
+	Select.prototype.doCallBack = function(fn, el) {
 		fn({
 			el: el,
-			value: getValue(el)
+			value: this.getValue(el)
 		});
 	}
 
-	function changeSelectedAttrAndClass(e) {
+	Select.prototype.changeSelectedAttrAndClass = function(e) {
 		const newSelectedItem = e.target.closest('.select__item');
 		const oldSelectedItem = newSelectedItem.parentElement.querySelector(`.${defaultClasses.listItemSelectedClass}`);
 		
-		// console.log(selectedItem)
-
 		oldSelectedItem.classList.remove(defaultClasses.listItemSelectedClass);
 		oldSelectedItem.removeAttribute('data-selected');
 		newSelectedItem.classList.add(defaultClasses.listItemSelectedClass);
 		newSelectedItem.setAttribute('data-selected', 'selected');
 	}
 
-	function onSelect(e) {
-		close.call(this);
+	Select.prototype.onSelect = function(e) {
+		this.close();
 		if (this.callBack) {
-			doCallBack.apply(this, [this.callBack, e.target.closest('.select__item')]);
+			this.doCallBack(this.callBack, e.target.closest('.select__item'));
 		}
-		changeSelectedAttrAndClass.call(this, e);
+		this.changeSelectedAttrAndClass(e);
 		this.text.textContent = (e.target.closest('.select__item').textContent);
 		this.select.value = e.target.closest('.select__item').getAttribute('data-value');
 	}
 
-	function initClickEvent() {
+	Select.prototype.initClickEvent = function() {
 		const _this = this;
 
 		this.newSelect.addEventListener('click', function(e) {
@@ -199,13 +199,13 @@
 			e.stopPropagation();
 			if (e.target.closest('.select')) {
 				if (e.target.closest('.select').classList.contains('select--open')) {
-					close.call(_this);
+					_this.close();
 				}else {
-					open.call(_this);
+					_this.open();
 				}
 			}
 			if (e.target.closest('.select__item')) {
-				onSelect.call(_this, e);
+				_this.onSelect(e);
 			}
 		});
 	}
