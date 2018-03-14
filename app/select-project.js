@@ -35,6 +35,8 @@
 		listItemSelectedClass: 'select__item--selected'
 	};
 
+	const eventHandlers = ['clickHandler'];
+
 	function Select(obj) {
 		this.selectEl = obj.selector;
 		this.callBack = obj.callBack;
@@ -43,8 +45,13 @@
 		this.listWrapper = null;
 		this.select = document.querySelector(this.selectEl);
 		
+		// It gives the ability to remove eventListener if the plugin is destroyed.
+		eventHandlers.forEach(handler => {
+			this[handler] = this[handler].bind(this);
+		});
+		
 		this.createNewSelect(this.selectEl, this.getSelectAttributes(this.selectEl), this.getOptionAttributes(this.selectEl));
-		this.initClickEvent();
+		this.initEvents();
 	}
 
 	Select.prototype.getSelectAttributes = function(el) {
@@ -191,23 +198,33 @@
 		this.select.value = e.target.closest('.select__item').getAttribute('data-value');
 	}
 
-	Select.prototype.initClickEvent = function() {
-		const _this = this;
+	Select.prototype.clickHandler = function(e) {
+		e.preventDefault();
+		e.stopPropagation();
+		if (e.target.closest('.select')) {
+			if (e.target.closest('.select').classList.contains('select--open')) {
+				this.close();
+			}else {
+				this.open();
+			}
+		}
+		if (e.target.closest('.select__item')) {
+			this.onSelect(e);
+		}
+	}
 
-		this.newSelect.addEventListener('click', function(e) {
-			e.preventDefault();
-			e.stopPropagation();
-			if (e.target.closest('.select')) {
-				if (e.target.closest('.select').classList.contains('select--open')) {
-					_this.close();
-				}else {
-					_this.open();
-				}
-			}
-			if (e.target.closest('.select__item')) {
-				_this.onSelect(e);
-			}
-		});
+	Select.prototype.initEvents = function() {
+		this.newSelect.addEventListener('click', this.clickHandler);
+	}
+
+	Select.prototype.detachEvents = function() {
+		this.newSelect.removeEventListener('click', this.clickHandler);
+	}
+
+	Select.prototype.destroy = function() {
+		this.detachEvents();
+		this.newSelect.parentElement.removeChild(this.newSelect);
+		this.select.removeAttribute('style');
 	}
 
 	return Select;
