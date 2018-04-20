@@ -9,18 +9,16 @@
 })(typeof global !== 'undefined' ? global : window || this.window || this.global, function (root) {
 	'use strict';
 
-	if (!Element.prototype.closest) {
-		(function(ELEMENT) {
-			ELEMENT.matches = ELEMENT.matches || ELEMENT.mozMatchesSelector || ELEMENT.msMatchesSelector || ELEMENT.oMatchesSelector || ELEMENT.webkitMatchesSelector;
-			ELEMENT.closest = ELEMENT.closest || function closest(selector) {
-				if (!this) return null;
-				if (this.matches(selector)) return this;
-				if (!this.parentElement) {
-					return null
-				}else return this.parentElement.closest(selector)
-			};
-		}(Element.prototype));
-	}
+	(function(el) {
+		el.matches = el.matches || el.mozMatchesSelector || el.msMatchesSelector || el.oMatchesSelector || el.webkitMatchesSelector;
+		el.closest = el.closest || function closest(selector) {
+			if (!this) return null;
+			if (this.matches(selector)) return this;
+			if (!this.parentElement) {
+				return null
+			}else return this.parentElement.closest(selector)
+		};
+	}(Element.prototype));
 
 	window.Select = Select || {};
 
@@ -75,13 +73,15 @@
 	}
 
 	Select.prototype.createNewSelect = function(el, selectArray, optionsArray) {
+		let isSelectedAttr = false;
+
 		this.hideSelectEl(el);
 
 		this.newSelect = document.createElement('DIV');
 		this.newSelect.className = defaultClasses.newSelectClass
-		selectArray.forEach(function(item) {
+		selectArray.forEach((item, i) => {
 			this.newSelect.setAttribute('data-' + item.name, item.value);
-		}, this);
+		});
 
 		this.button = document.createElement('A');
 		this.button.className = defaultClasses.buttonClass;
@@ -101,7 +101,6 @@
 
 		this.optionInnerText = this.getOptionInnerText(el);
 
-		let isSelectedAttr = false;
 		optionsArray.forEach((item, i) => {
 			this.listItem = document.createElement('LI');
 			this.listItem.className = defaultClasses.listItemClass;
