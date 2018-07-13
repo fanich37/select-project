@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 	<meta charset="UTF-8">
 	<title>Select project</title>
 	<link rel="stylesheet" href="select.min.css">
 </head>
+
 <body>
 	<div style='padding:50px;width:500px;height:100px;background-color:lightgrey'>
 		<select id="test">
@@ -17,7 +19,7 @@
 	</div>
 	<div style='padding:50px;width:500px;height:100px;background-color:lightgrey'>
 		<select id="test2">
-			<option value="test1">test1 long message</option>
+			<option value="test1">test1 very long long looooong long message</option>
 			<option value="test2">test2</option>
 			<option value="test3">test3</option>
 			<option value="test4">test4</option>
@@ -32,17 +34,18 @@
 	<script type="text/javascript">
 		new Select({
 			selector: '#test',
-			callBack: function(item) {
+			callBack: function (item) {
 				console.log(item.el);
 				console.log('You selected the item with a value: ' + item.value);
 			}
 		});
 		new Select({
 			selector: '#test2',
-			callBack: function(item) {
+			callBack: function (item) {
 				alert(item.el.getAttribute('data-value'));
 			}
 		});
 	</script>
 </body>
+
 </html>
